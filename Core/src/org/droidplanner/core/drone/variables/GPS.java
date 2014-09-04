@@ -120,10 +120,8 @@ public class GPS extends DroneVariable implements DroneInterfaces.OnDroneListene
             final int timeDelta = getPositionAgeInMillis();
             final double groundSpeed = myDrone.getSpeed().getGroundSpeed().valueInMetersPerSecond();
 
-            if (timeDelta > 0 && groundSpeed > 0) {
-                GeoTools.newCoordFromBearingAndDistance(position, getCourse(),
-                        timeDelta / 1000.0 * groundSpeed, reusableInterpolatedPosition);
-            }
+            GeoTools.newCoordFromBearingAndDistance(position, getCourse(),
+                    timeDelta / 1000.0 * groundSpeed, reusableInterpolatedPosition);
             mIsInterpolatedPositionStale.set(false);
         }
 
@@ -145,10 +143,13 @@ public class GPS extends DroneVariable implements DroneInterfaces.OnDroneListene
 	public void setPosition(Coord2D position) {
 		this.timeOfPosition = System.currentTimeMillis();
 		recalculateCourse(position);
+
 		if (this.position != position) {
 			this.position = position;
 			myDrone.notifyDroneEvent(DroneEventsType.GPS);
 		}
+
+        mIsInterpolatedPositionStale.set(true);
 		resetInterpolatorNotifierScheduler();
 	}
 
@@ -176,7 +177,7 @@ public class GPS extends DroneVariable implements DroneInterfaces.OnDroneListene
 	private void resetInterpolatorNotifierScheduler(){
         if(scheduler == null || scheduler.isShutdown()){
             scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(periodicInterpolatorNotifier, INTERPOLATOR_NOTIFY_RATE,
+            scheduler.scheduleAtFixedRate(periodicInterpolatorNotifier, 0,
                     INTERPOLATOR_NOTIFY_RATE, TimeUnit.MILLISECONDS);
         }
 	}

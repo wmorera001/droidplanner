@@ -41,6 +41,20 @@ public class Coord2D {
 		return latitude == 0 || longitude == 0;
 	}
 
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+
+        if(!(o instanceof Coord2D)){
+            return false;
+        }
+
+        Coord2D that = (Coord2D) o;
+        return this.latitude == that.latitude && this.longitude == that.longitude;
+    }
+
 	@Override
 	public String toString() {
 		return "lat/lon: " + getLat() + "/" + getLng();

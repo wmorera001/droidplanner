@@ -69,20 +69,30 @@ public class GeoTools {
 	 */
 	public static Coord2D newCoordFromBearingAndDistance(Coord2D origin, double bearing,
 														 double distance, Coord2D reuse) {
-		double lat = origin.getLat();
-		double lon = origin.getLng();
-		double lat1 = Math.toRadians(lat);
-		double lon1 = Math.toRadians(lon);
-		double brng = Math.toRadians(bearing);
-		double dr = distance / RADIUS_OF_EARTH;
+        if(reuse == null || origin == null){
+            return null;
+        }
 
-		double lat2 = Math.asin(Math.sin(lat1) * Math.cos(dr) + Math.cos(lat1) * Math.sin(dr)
-				* Math.cos(brng));
-		double lon2 = lon1
-				+ Math.atan2(Math.sin(brng) * Math.sin(dr) * Math.cos(lat1),
-						Math.cos(dr) - Math.sin(lat1) * Math.sin(lat2));
+        if(distance == 0){
+            //Avoid unnecessary calculations.
+            reuse.set(origin);
+        }
+        else {
+            double lat = origin.getLat();
+            double lon = origin.getLng();
+            double lat1 = Math.toRadians(lat);
+            double lon1 = Math.toRadians(lon);
+            double brng = Math.toRadians(bearing);
+            double dr = distance / RADIUS_OF_EARTH;
 
-        reuse.set(Math.toDegrees(lat2), Math.toDegrees(lon2));
+            double lat2 = Math.asin(Math.sin(lat1) * Math.cos(dr) + Math.cos(lat1) * Math.sin(dr)
+                    * Math.cos(brng));
+            double lon2 = lon1
+                    + Math.atan2(Math.sin(brng) * Math.sin(dr) * Math.cos(lat1),
+                    Math.cos(dr) - Math.sin(lat1) * Math.sin(lat2));
+
+            reuse.set(Math.toDegrees(lat2), Math.toDegrees(lon2));
+        }
 		return reuse;
 	}
 
