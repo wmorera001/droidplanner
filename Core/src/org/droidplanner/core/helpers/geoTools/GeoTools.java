@@ -82,7 +82,8 @@ public class GeoTools {
 				+ Math.atan2(Math.sin(brng) * Math.sin(dr) * Math.cos(lat1),
 						Math.cos(dr) - Math.sin(lat1) * Math.sin(lat2));
 
-		return reuse.set(Math.toDegrees(lat2), Math.toDegrees(lon2));
+        reuse.set(Math.toDegrees(lat2), Math.toDegrees(lon2));
+		return reuse;
 	}
 
 	/**

@@ -58,10 +58,16 @@ public class DroneImpl implements Drone {
 	private final MAVLinkStreams.MAVLinkOutputStream MavClient;
 	private final Preferences preferences;
 
+    /**
+     * Used to post events, as in many case, they need to be posted in the MAIN thread.
+     */
+    private final DroneInterfaces.Handler mHandler;
+
 	public DroneImpl(MAVLinkStreams.MAVLinkOutputStream mavClient, DroneInterfaces.Clock clock,
 			DroneInterfaces.Handler handler, Preferences pref) {
 		this.MavClient = mavClient;
 		this.preferences = pref;
+        mHandler = handler;
 		state = new State(this, clock, handler);
 		heartbeat = new HeartBeat(this, handler);
 		parameters = new Parameters(this, handler);
@@ -100,8 +106,14 @@ public class DroneImpl implements Drone {
 	}
 
 	@Override
-	public void notifyDroneEvent(DroneInterfaces.DroneEventsType event) {
-		events.notifyDroneEvent(event);
+	public void notifyDroneEvent(final DroneInterfaces.DroneEventsType event) {
+        //Using handler in order to broadcast the event on the main thread.
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                events.notifyDroneEvent(event);
+            }
+        });
 	}
 
 	@Override
