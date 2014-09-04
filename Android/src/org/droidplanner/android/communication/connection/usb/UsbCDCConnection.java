@@ -1,4 +1,4 @@
-package org.droidplanner.android.communication.connection;
+package org.droidplanner.android.communication.connection.usb;
 
 import java.io.IOException;
 
@@ -9,17 +9,19 @@ import android.util.Log;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
-public class UsbCDCConnection extends UsbConnection {
+class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
+    private static final String TAG = UsbCDCConnection.class.getSimpleName();
+
 	private static UsbSerialDriver sDriver = null;
 
-	protected UsbCDCConnection(Context parentContext) {
-		super(parentContext);
-	}
+    protected UsbCDCConnection(Context context, int baudRate) {
+        super(context, baudRate);
+    }
 
-	@Override
-	protected void openConnection() throws IOException {
+    @Override
+	protected void openUsbConnection() throws IOException {
 		// Get UsbManager from Android.
-		UsbManager manager = (UsbManager) parentContext.getSystemService(Context.USB_SERVICE);
+		UsbManager manager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
 
 		// Find the first available driver.
 		sDriver = UsbSerialProber.findFirstDevice(manager);
@@ -28,10 +30,10 @@ public class UsbCDCConnection extends UsbConnection {
 			Log.d("USB", "No Devices found");
 			throw new IOException("No Devices found");
 		} else {
-			Log.d("USB", "Opening using Baud rate " + baud_rate);
+			Log.d("USB", "Opening using Baud rate " + mBaudRate);
 			try {
 				sDriver.open();
-				sDriver.setParameters(baud_rate, 8, UsbSerialDriver.STOPBITS_1,
+				sDriver.setParameters(mBaudRate, 8, UsbSerialDriver.STOPBITS_1,
 						UsbSerialDriver.PARITY_NONE);
 			} catch (IOException e) {
 				Log.e("USB", "Error setting up device: " + e.getMessage(), e);
@@ -46,21 +48,24 @@ public class UsbCDCConnection extends UsbConnection {
 	}
 
 	@Override
-	protected void readDataBlock() throws IOException {
+	protected int readDataBlock(byte[] readData) throws IOException {
 		// Read data from driver. This call will return upto readData.length
 		// bytes.
 		// If no data is received it will timeout after 200ms (as set by
 		// parameter 2)
+        int iavailable = 0;
 		try {
 			iavailable = sDriver.read(readData, 200);
 		} catch (NullPointerException e) {
-			Log.e("USB", "Error Reading: " + e.getMessage()
-					+ "\nAssuming inaccessible USB device.  Closing connection.", e);
-			closeConnection();
+            final String errorMsg = "Error Reading: " + e.getMessage()
+                    + "\nAssuming inaccessible USB device.  Closing connection.";
+            Log.e(TAG, errorMsg, e);
+            throw new IOException(errorMsg, e);
 		}
+
 		if (iavailable == 0)
 			iavailable = -1;
-		// Log.d("USB", "Bytes read" + iavailable);
+        return iavailable;
 	}
 
 	@Override
@@ -68,7 +73,7 @@ public class UsbCDCConnection extends UsbConnection {
 		// Write data to driver. This call should write buffer.length bytes
 		// if data cant be sent , then it will timeout in 500ms (as set by
 		// parameter 2)
-		if (connected && sDriver != null) {
+		if (sDriver != null) {
 			try {
 				sDriver.write(buffer, 500);
 			} catch (IOException e) {
@@ -78,7 +83,7 @@ public class UsbCDCConnection extends UsbConnection {
 	}
 
 	@Override
-	protected void closeConnection() throws IOException {
+	protected void closeUsbConnection() throws IOException {
 		if (sDriver != null) {
 			try {
 				sDriver.close();
@@ -88,4 +93,9 @@ public class UsbCDCConnection extends UsbConnection {
 			sDriver = null;
 		}
 	}
+
+    @Override
+    public String toString(){
+        return TAG;
+    }
 }
