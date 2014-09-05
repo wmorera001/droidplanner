@@ -23,7 +23,7 @@ public class GPS extends DroneVariable implements DroneInterfaces.OnDroneListene
 
     /**
      * Stores the interpolated drone position.
-     * * The interpolated position is calculated lazily, and stored until the next update.
+     * The interpolated position is calculated lazily, and stored until the next update.
      */
     private final Coord2D reusableInterpolatedPosition = new Coord2D(0,0);
 
