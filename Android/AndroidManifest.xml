@@ -63,13 +63,10 @@
         android:windowSoftInputMode="adjustPan"
         tools:replace="android:label">
 
-        <!-- You must insert your own Google Maps for Android API v2 key in here. -->
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDFsAn5xo-mILEirpcUsF9BU9Vb_yR-Er4" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+ 
 
         <service android:name=".android.communication.service.MAVLinkService" >
         </service>
@@ -140,6 +137,12 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
             </receiver>
+
+
+        <!-- You must insert your own Google Maps for Android API v2 key in here. -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyA9vA861kMmLABOdbCt_ZIxn6yMuDosmYk" />
     </application>
 
 </manifest>
