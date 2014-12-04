@@ -4,4 +4,4 @@ DroidPlanner APK files
 | ----------|--------|-------|------|
 | DroidPlanner Joysticks | 1-12-2014  | 5MB  | Joysticks enabled |
 | DroidPlanner (branch master) | 27-11-2014| 5.2MB | without modifications |
-| DroidPlanner ssh | 3-12-2014| 5.2MB | SSH |
+| DroidPlanner ssh | 4-12-2014| 5.2MB | SSH |
